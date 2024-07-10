@@ -1,5 +1,4 @@
 import streamlit as st
-pip install gtts
 from gtts import gTTS
 import os
 import base64
