@@ -1,7 +1,9 @@
-import streamlit as st                                                                                                 
-import os  
+import streamlit as st
+from googletrans import Translator as GoogleTranslator
 from gtts import gTTS
-import base64 
+import os
+import base64
+from docx import Document
 
 language_mapping = {
     "en": "English",
@@ -59,18 +61,25 @@ language_mapping = {
     "jw": "Javanese"
 }
 
-# Function to convert text to speech and save as an MP3 file
+def translate_text_with_google(text, target_language):
+    google_translator = GoogleTranslator()
+    max_chunk_length = 500
+    translated_text = ""
+    for i in range(0, len(text), max_chunk_length):
+        chunk = text[i:i + max_chunk_length]
+        translated_chunk = google_translator.translate(chunk, dest=target_language).text
+        translated_text += translated_chunk
+    return translated_text
+
 def convert_text_to_speech(text, output_file, language='en'):
     if text:
-        supported_languages = list(language_mapping.keys())  # Add more supported languages as needed
+        supported_languages = list(language_mapping.keys())
         if language not in supported_languages:
             st.warning(f"Unsupported language: {language}")
             return
-
         tts = gTTS(text=text, lang=language)
         tts.save(output_file)
 
-# Function to generate a download link for a file
 def get_binary_file_downloader_html(link_text, file_path, file_format):
     with open(file_path, 'rb') as f:
         file_data = f.read()
@@ -78,32 +87,37 @@ def get_binary_file_downloader_html(link_text, file_path, file_format):
     download_link = f'<a href="data:{file_format};base64,{b64_file}" download="{os.path.basename(file_path)}">{link_text}</a>'
     return download_link
 
+def convert_text_to_word_doc(text, output_file):
+    doc = Document()
+    doc.add_paragraph(text)
+    doc.save(output_file)
+
+def translate_text_with_fallback(text, target_language):
+    try:
+        return translate_text_with_google(text, target_language)
+    except Exception as e:
+        st.warning(f"Google Translate error: {str(e)}")
+        return ""
+
+def count_words(text):
+    words = text.split()
+    return len(words)
+
 def main():
-    st.title("Text to Audio Conversion")
+    st.image("jangirii.png", width=300)
+    st.title("Text Translation and Conversion to Speech (MultiLingual)")
 
-    # Get user input
-    text = st.text_area("Enter text to convert to speech:", height=300)
+    text = st.text_area("Enter text to translate and convert to speech:", height=300)
 
-    target_language = st.selectbox("Select language for speech:", list(language_mapping.values()))
+    word_count = count_words(text)
+    st.subheader(f"Word Count: {word_count} words")
 
-    # Add a button to trigger the text-to-speech conversion
-    if st.button("Convert to Speech and Download Audio"):
-        # Define target_language_code within this scope
+    target_language = st.selectbox("Select target language:", list(language_mapping.values()))
+
+    if st.button("Translate - Convert to Speech and get Translated document"):
         target_language_code = [code for code, lang in language_mapping.items() if lang == target_language][0]
 
-        if text:
-            # Convert text to speech
-            output_file = "output.mp3"
-            convert_text_to_speech(text, output_file, language=target_language_code)
+        translated_text = translate_text_with_fallback(text, target_language_code)
 
-            # Play the generated speech
-            audio_file = open(output_file, 'rb')
-            st.audio(audio_file.read(), format='audio/mp3')
-
-            # Provide a download link for the MP3 file
-            st.markdown(get_binary_file_downloader_html("Download Audio File", output_file, 'audio/mp3'), unsafe_allow_html=True)
-        else:
-            st.warning("Please enter some text to convert.")
-
-if __name__ == "__main__":
-    main()
+        if translated_text:
+            st.subheader(f"Translated text ({target_language}):
