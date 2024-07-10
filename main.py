@@ -1,4 +1,3 @@
-streamlit run main.py
 import streamlit as st
 from gtts import gTTS
 from googletrans import Translator
