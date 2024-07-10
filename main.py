@@ -1,5 +1,4 @@
-import streamlit as st                                                  
-from gtts import gTTS                                                   
+import streamlit as st                                                                                                 
 import os                                                               
 import base64 
 
