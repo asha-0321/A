@@ -1,3 +1,4 @@
+pip install gtts
 docx2txt
 docx
 streamlit
@@ -21,4 +22,3 @@ nltk
 spacy
 reportlab
 fpdf  
-Gtts
