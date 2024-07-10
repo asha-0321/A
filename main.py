@@ -1,7 +1,7 @@
-import streamlit as st
-from gtts import gTTS
-import os
-import base64
+import streamlit as st                                                  
+from gtts import gTTS                                                   
+import os                                                               
+import base64 
 
 language_mapping = {
     "en": "English",
