@@ -1,6 +1,6 @@
 import streamlit as st                                                                                                 
 import os  
-from gtts from gTTS
+from gtts import gTTS
 import base64 
 
 language_mapping = {
