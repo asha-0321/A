@@ -120,4 +120,5 @@ def main():
         translated_text = translate_text_with_fallback(text, target_language_code)
 
         if translated_text:
-            st.subheader(f"Translated text ({target_language}):
+          st.subheader(f"Translated text ({target_language}):")
+
